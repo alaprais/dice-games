@@ -25,9 +25,9 @@ barplot(table(results)/sum(table(results)))
 roll_n_dice <- function(n){ return(sample(1:6,n,replace=TRUE)) }
 
 # function that gives empirical distribution of observed rv
-show_emp_dist <- function(vec, main='title'){
+show_emp_dist <- function(vec, main='title',xlab='x'){
   print(table(vec)/sum(table(vec)))
-  barplot(table(vec)/sum(table(vec)), main=main)
+  barplot(table(vec)/sum(table(vec)), main=main,xlab=xlab)
 }
 show_emp_dist(roll_n_dice(30))
 
@@ -50,13 +50,7 @@ count_success(roll_n_dice((10)), 4)
 library(stringr)
 
 # function to get nwounds caused by 1 model attacking
-keywords <- list(ap=2, 
-                 blast=c(3,20),
-                 furious=1,
-                 lance=1,
-                 regeneration=1,
-                 rending=1,
-                 poison=1)
+
 count_melee_wounds <- function(attacks,quality,defense,keywords=list()){
   quality_roll <- roll_n_dice(max(attacks,0))
   nhits <- count_success(quality_roll,quality) +
@@ -98,8 +92,31 @@ count_melee_wounds <- function(attacks,quality,defense,keywords=list()){
                               count_success(nwounds,5))
   return (max(nwounds,0))
 }
+keywords <- list(ap=2, 
+                 blast=c(3,20),
+                 furious=1,
+                 lance=1,
+                 regeneration=1,
+                 rending=1,
+                 poison=1)
 
-count_melee_wounds(3,4,3)
+
+##### BELOW EX OF HOW POISON IS BETTER THAN RENDING
+
+keywords1 <- list(poison=1)
+keywords <- list(rending=1)
+#count_melee_wounds(3,4,3,keywords)
+
+x_vec <- create_emp_dist(count_melee_wounds, 10,3,5,keywords1, nsim=10000)
+show_emp_dist(x_vec, xlab='wounds', main='poison')
+
+x_vec2 <- create_emp_dist(count_melee_wounds, 10,3,5,keywords, nsim=10000)
+show_emp_dist(x_vec2, xlab='wounds',main='rending')
+
+boxplot(list('poison'=x_vec2, 'rending'=x_vec), horizontal=TRUE)
+
+mean(x_vec)
+mean(x_vec2)
 
 
-
+#TODO impact wounds
