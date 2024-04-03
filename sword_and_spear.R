@@ -72,19 +72,19 @@ win_differential(4,4)
 
 
 
-get_wins_and_losses <- function(nmydice=4,noppdice=4,nsim=10000, modifier=0){
+get_wins_and_losses <- function(nmydice=4,noppdice=4,nsim=10000, modifier=0, win_match=FALSE){
     wins <- c()
     losses <- c()
     for (i in 1:nsim){
       my_roll <- sort(roll_n_dice(nmydice), decreasing = TRUE)[1:4] 
       opp_roll <- sort(roll_n_dice(noppdice), decreasing = TRUE)[1:4] - modifier
       res <- my_roll - opp_roll
-      wins <- c(wins,sum(res>0))
+      wins <- c(wins,sum(res>0)+ ifelse(win_match,sum(res==0),0))
       losses <- c(losses, sum(res<0))
     }
     temp <- rbind(table(wins),table(losses))/length(wins)
     barplot(temp,beside=T, col=c("darkblue","red"),
-            main=paste("My",nmydice,"V Opp",noppdice))
+            main=paste("My",nmydice,"V Opp",noppdice, "matching",win_match))
 }
 
-get_wins_and_losses(5,4)
+get_wins_and_losses(5,4,win_match = FALSE)
