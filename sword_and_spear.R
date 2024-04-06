@@ -6,7 +6,7 @@
 ##                             2. adding (or subtracting) from final rolls
 ######################
 
-roll_n_dice <- function(n){ return(sample(1:20,n,replace=TRUE)) }
+roll_n_dice <- function(n){ return(sample(1:6,n,replace=TRUE)) }
 
 ## what is the distribution like when you roll more than 4 
 ## but still choose top 4
@@ -66,6 +66,7 @@ win_differential <- function(nmydice=4,noppdice=4,nsim=10000, modifier=0){
   diffs <- wins - losses
   barplot(table(diffs)/length(diffs),main=paste("My",nmydice,
                                                 "V Opp",noppdice))
+  print(table(diffs)/length(diffs))
 }
 
 win_differential(4,4)
@@ -87,4 +88,94 @@ get_wins_and_losses <- function(nmydice=4,noppdice=4,nsim=10000, modifier=0, win
             main=paste("My",nmydice,"V Opp",noppdice, "matching",win_match))
 }
 
-get_wins_and_losses(5,4,win_match = FALSE)
+get_wins_and_losses(4,4,win_match=FALSE)
+
+
+########## What if we mixed in different die types
+roll_n_dx <- function(n,x){
+  if (n>0){out <- sample(1:x,n,replace=TRUE)}
+  else {out <- 0}
+  return(out) 
+  }
+
+#d4,d6,d8,d10,d12,d20
+get_wins_and_losses_dx <- function(mydice=c(0,4,0,0,0,0), oppdice=c(0,4,0,0,0,0),
+                                nsim=10000, modifier=0){
+  dice_order <- c(4,6,8,10,12,20)
+  wins <- c()
+  losses <- c()
+  for (i in 1:nsim){
+    my_roll <- c()
+    for (i in 1:length(mydice)){my_roll <- c(my_roll, roll_n_dx(mydice[i],dice_order[i]))}
+    my_roll <- sort(my_roll, decreasing = TRUE)[1:4] 
+    
+    opp_roll <- c()
+    for (i in 1:length(oppdice)){opp_roll <- c(opp_roll, roll_n_dx(oppdice[i],dice_order[i]))}
+    opp_roll <- sort(opp_roll, decreasing = TRUE)[1:4] 
+    
+    res <- my_roll - opp_roll # single fight result
+    wins <- c(wins,sum(res>0))
+    losses <- c(losses, sum(res<0))
+  }
+
+  temp <- rbind(table(wins),table(losses))/nsim
+  barplot(temp,beside=T, col=c("darkblue","red"),
+          main=paste('temp'))
+}
+#d4,d6,d8,d10,d12,d20
+get_wins_and_losses_dx(mydice =c(0,0,0,5,0,0),
+                       oppdice=c(0,0,0,4,0,0))
+
+
+################
+win_differential_dx <- function(mydice=c(0,3,0,0,0,0),
+                             oppdice=c(0,3,0,0,0,0),
+                             nsim=10000, modifier=0){
+  dice_order <- c(4,6,8,10,12,20)
+  wins <- c()
+  losses <- c()
+  for (i in 1:nsim){
+    my_roll <- c()
+    for (i in 1:length(mydice)){my_roll <- c(my_roll, roll_n_dx(mydice[i],dice_order[i]))}
+    my_roll <- sort(my_roll, decreasing = TRUE)[1:3] 
+    
+    opp_roll <- c()
+    for (i in 1:length(oppdice)){opp_roll <- c(opp_roll, roll_n_dx(oppdice[i],dice_order[i]))}
+    opp_roll <- sort(opp_roll, decreasing = TRUE)[1:3] 
+    
+    res <- my_roll - opp_roll #result of single fight
+    wins <- c(wins,sum(res>0))
+    losses <- c(losses, sum(res<0))
+  }
+  diffs <- wins - losses
+  barplot(table(diffs)/nsim,main=paste("My","v Opp"))
+  print(table(diffs)/length(diffs))
+  boxplot(diffs, horizontal=TRUE)
+  print(paste("Comeback",ecdf(diffs)(-1))) # prob of disadvantaged side "winning"
+  print(paste("Clinical",1-ecdf(diffs)(0)) ) #prob of advantaged side "winning"
+}
+#d4,d6,d8,d10,d12,d20
+win_differential_dx(mydice=c(0,0,0,0,3,0),oppdice=c(0,0,0,0,3,0))
+win_differential_dx(mydice=c(0,0,0,0,4,0),oppdice=c(0,0,0,0,3,0))
+win_differential_dx(mydice=c(0,2,0,0,3,0),oppdice=c(0,0,0,0,3,0))
+
+win_differential_dx(mydice=c(0,3,0,0,0,0),oppdice=c(0,3,0,0,0,0))
+win_differential_dx(mydice=c(0,4,0,0,0,0),oppdice=c(0,3,0,0,0,0))
+win_differential_dx(mydice=c(0,5,0,0,0,0),oppdice=c(0,3,0,0,0,0))
+win_differential_dx(mydice=c(0,7,0,0,0,0),oppdice=c(0,3,0,0,0,0))
+
+win_differential_dx(mydice=c(0,2,0,0,0,0),oppdice=c(0,2,0,0,0,0))
+win_differential_dx(mydice=c(0,5,0,0,0,0),oppdice=c(0,2,0,0,0,0))
+
+win_differential_dx(mydice=c(0,3,0,0,0,0),oppdice=c(0,3,0,0,0,0))
+win_differential_dx(mydice=c(0,4,0,0,0,0),oppdice=c(0,4,0,0,0,0))
+
+win_differential_dx(mydice=c(0,4,0,0,0,0),oppdice=c(0,3,0,0,0,0))
+win_differential_dx(mydice=c(0,5,0,0,0,0),oppdice=c(0,4,0,0,0,0))
+win_differential_dx(mydice=c(0,10,0,0,0,0),oppdice=c(0,9,0,0,0,0))
+
+
+
+
+
+
