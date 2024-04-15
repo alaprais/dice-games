@@ -198,7 +198,7 @@ shooting_results_d6 <- function(nshoot, ndef, def_modifier=0,
   
 }
 
-shooting_results_d6(2,2,def_multiplier = 3)
+shooting_results_d6(3,3,def_multiplier = 3)
 
 
 
