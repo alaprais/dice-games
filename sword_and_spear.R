@@ -175,7 +175,47 @@ win_differential_dx(mydice=c(0,5,0,0,0,0),oppdice=c(0,4,0,0,0,0))
 win_differential_dx(mydice=c(0,10,0,0,0,0),oppdice=c(0,9,0,0,0,0))
 
 
+shooting_results_d6 <- function(nshoot, ndef, def_modifier=0,
+                                def_multiplier=1,nsim=1000){
+  kills <- c()
+  slows <- c()
+  for (i in 1:nsim){
+    shoot_roll <- sort(roll_n_dice(nshoot),decreasing = TRUE)[1:2]
+    def_roll <- sort(roll_n_dice(ndef),decreasing = TRUE)[1:2]
+  
+    
+    kills <- c(kills,sum(shoot_roll - def_multiplier*def_roll > 0))
+    #kills <- c(kills,sum(shoot_roll-def_roll-def_modifier>0))
+    slows <- c(slows,sum(shoot_roll-def_roll >= 0))
+  }
+  barplot(table(kills)/nsim,main=paste("Kills"))
+  print(table(kills)/nsim)
+  boxplot(kills, horizontal=TRUE, main=paste("Kills Dist"))
+  
+  barplot(table(slows)/nsim,main=paste("Slows"))
+  print(table(slows)/nsim)
+  boxplot(slows, horizontal=TRUE, main=paste("Slows Dist"))
+  
+}
+
+shooting_results_d6(2,2,def_multiplier = 3)
 
 
+
+movement_results <- function(ndice,nchoose=1,nslows=0,nsim=1000){
+  # required: ndice >= nchoose
+  distance <- c()
+  for (i in 1:nsim){
+    move_roll <- sum(sort(roll_n_dice(ndice),decreasing = TRUE)[1:nchoose])
+    distance <- c(distance,move_roll)
+  }
+  
+  print(table(distance)/nsim)
+  barplot(table(distance)/nsim,main=paste("Distance --",ndice,"choose",nchoose))
+  boxplot(distance, horizontal=TRUE, 
+          main=paste("Distance Dist --",ndice,"choose",nchoose))
+}
+
+movement_results(4,nchoose = 2)
 
 
